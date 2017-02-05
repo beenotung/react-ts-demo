@@ -1,0 +1,28 @@
+#!/bin/bash
+mkdir -p dist
+mkdir -p src/components
+npm i -D webpack http-server # or use global package
+npm init -f
+npm i -S react react-dom @types/react @types/react-dom
+npm i -D typescript awesome-typescript-loader source-map-loader
+
+function addScript {
+  ## Usage : addScript <name> <content>
+  line="\    \"$1\": \"$2\","
+  res=$(grep "$line" package.json | wc -l)
+  if [ "$res" == 0 ]; then
+    sed -i "/\"scripts\": {/a $line" package.json
+  fi
+}
+$(addScript "build" "webpack")
+$(addScript "start" "http-server")
+
+function cpScript {
+  if [ ! -f "$2" ]; then
+    cp $1 $2
+  fi
+}
+$(cpScript node_modules/react/dist/react.js dist/react.js)
+$(cpScript node_modules/react/dist/react.min.js dist/react.min.js)
+$(cpScript node_modules/react-dom/dist/react-dom.js dist/react-dom.js)
+$(cpScript node_modules/react-dom/dist/react-dom.min.js dist/react-dom.min.js)
